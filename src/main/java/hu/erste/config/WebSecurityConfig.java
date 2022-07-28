@@ -10,16 +10,8 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Override
-    protected void configure(HttpSecurity http) throws Exception {
-        http
-                .authorizeRequests()
-                .anyRequest().fullyAuthenticated()
-                .and()
-                .formLogin();
-    }
-
-    @Override
     public void configure(AuthenticationManagerBuilder auth) throws Exception {
+        // configure Authentication ......
         auth
                 .ldapAuthentication()
                 .userDnPatterns("uid={0},ou=people")
@@ -30,6 +22,16 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .passwordCompare()
                 .passwordEncoder(new BCryptPasswordEncoder())
                 .passwordAttribute("userPassword");
+    }
+
+    @Override
+    protected void configure(HttpSecurity http) throws Exception {
+        // configure Authorization ......
+        http
+                .authorizeRequests()
+                .anyRequest().fullyAuthenticated()
+                .and()
+                .formLogin();
     }
 
 }
