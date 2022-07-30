@@ -1,14 +1,17 @@
 package hu.erste.config;
 
+import hu.erste.security.SimpleCacheUserAuthenticationProvider;
+import hu.erste.security.SimpleCacheUserDetailsService;
+import hu.erste.security.SimpleUserCache;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
 
 // https://docs.spring.io/spring-security/reference/servlet/authentication/architecture.html
@@ -17,33 +20,53 @@ import org.springframework.security.web.SecurityFilterChain;
 public class WebSecurityConfig {
 // https://docs.spring.io/spring-security/reference/servlet/authentication/passwords/in-memory.html
     @Bean
-    public InMemoryUserDetailsManager userDetailsService(PasswordEncoder passwordEncoder) {
-        UserDetails user = User.builder().passwordEncoder(passwordEncoder::encode)
-                .username("user")
-                .password("password")
-                .roles("USER")
-                .build();
-        return new InMemoryUserDetailsManager(user);
+    public SimpleUserCache userCache() {
+        return new SimpleUserCache(30000);
     }
 
     @Bean
-    public BCryptPasswordEncoder passwordEncoder() {
+    public SimpleCacheUserDetailsService userDetailsService(SimpleUserCache simpleUserCache,
+                                                            PasswordEncoder passwordEncoder) {
+        return new SimpleCacheUserDetailsService(simpleUserCache, passwordEncoder);
+    }
+
+    @Bean
+    public SimpleCacheUserAuthenticationProvider authenticationProvider(SimpleCacheUserDetailsService simpleCacheUserDetailsService,
+                                                                        PasswordEncoder passwordEncoder) {
+        SimpleCacheUserAuthenticationProvider authenticationProvider =
+                new SimpleCacheUserAuthenticationProvider(simpleCacheUserDetailsService, passwordEncoder);
+        return authenticationProvider;
+    }
+
+    @Bean
+    public ProviderManager providerManager(SimpleCacheUserAuthenticationProvider authenticationProvider) {
+        ProviderManager providerManager = new ProviderManager(authenticationProvider);
+        return providerManager;
+    }
+
+    @Bean
+    public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
 
     @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain filterChain(HttpSecurity http, AuthenticationManager authenticationManager) throws Exception {
+        http.authenticationManager(authenticationManager);
         http
+                .csrf().disable()
                 .authorizeRequests()
                 .anyRequest().fullyAuthenticated()
                 .and()
-                .formLogin().permitAll();
+                .httpBasic()
+                .and()
+                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+
         http.headers().frameOptions().sameOrigin();
         return http.build();
     }
 
     @Bean
     public WebSecurityCustomizer webSecurityCustomizer() {
-        return (web) -> web.ignoring().antMatchers("/images/**", "/js/**", "/webjars/**");
+        return (web) -> web.ignoring().antMatchers("/actuator/**", "/images/**", "/js/**", "/webjars/**");
     }
 }
