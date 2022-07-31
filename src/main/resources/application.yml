@@ -8,7 +8,7 @@ application:
             baseDN: DC=erste,DC=hu
             enabled: true
             groupSearchBase: ou=ESL,ou=Groups,ou=EBH
-            url: //lnvdevldp01.erste.hu:36511
+            url: ldap://localhost:8389/dc=springframework,dc=org
             userDnPattern: uid={0},ou=Technical_accounts,ou=
             userCacheExpiryMs: 60000
 logging:

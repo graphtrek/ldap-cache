@@ -2,10 +2,13 @@ package hu.erste.config;
 
 import hu.erste.security.SimpleCacheUserAuthenticationProvider;
 import hu.erste.security.SimpleCacheUserDetailsService;
+import hu.erste.security.SimpleLdapAuthenticationProvider;
 import hu.erste.security.SimpleUserCache;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.ldap.core.LdapTemplate;
+import org.springframework.ldap.core.support.LdapContextSource;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -25,8 +28,31 @@ public class WebSecurityConfig {
     }
 
     @Bean
-    public SimpleUserCache userCache(SecurityConfigurationProperties props) {
+    public LdapContextSource ldapContextSource(SecurityConfigurationProperties props) {
+        LdapContextSource contextSource = new LdapContextSource();
+        contextSource.setUrl(props.getLdap().getUrl());
+        contextSource.setAnonymousReadOnly(true);
+        contextSource.setUserDn("uid={0},ou=people");
+        //contextSource.setBase("ou=groups");
+        contextSource.afterPropertiesSet();
+        return contextSource;
+    }
 
+    @Bean
+    LdapTemplate ldapTemplate(LdapContextSource ldapContextSource) {
+        return new LdapTemplate(ldapContextSource);
+    }
+
+    @Bean
+    SimpleLdapAuthenticationProvider simpleLdapAuthenticationProvider(
+            SecurityConfigurationProperties props,
+            LdapContextSource contextSource,
+            LdapTemplate ldapTemplate){
+        return new SimpleLdapAuthenticationProvider(props,contextSource,ldapTemplate);
+    }
+
+    @Bean
+    public SimpleUserCache userCache(SecurityConfigurationProperties props) {
         return new SimpleUserCache(props.getLdap().getUserCacheExpiryMs());
     }
 
@@ -37,7 +63,7 @@ public class WebSecurityConfig {
     }
 
     @Bean
-    public SimpleCacheUserAuthenticationProvider authenticationProvider(
+    public SimpleCacheUserAuthenticationProvider simpleCacheAuthenticationProvider(
             SimpleCacheUserDetailsService simpleCacheUserDetailsService,
             PasswordEncoder passwordEncoder) {
         SimpleCacheUserAuthenticationProvider authenticationProvider =
@@ -46,8 +72,13 @@ public class WebSecurityConfig {
     }
 
     @Bean
-    public ProviderManager providerManager(SimpleCacheUserAuthenticationProvider authenticationProvider) {
-        ProviderManager providerManager = new ProviderManager(authenticationProvider);
+    public ProviderManager providerManager(
+            SimpleLdapAuthenticationProvider simpleLdapAuthenticationProvider,
+            SimpleCacheUserAuthenticationProvider simpleCacheUserAuthenticationProvider) {
+        ProviderManager providerManager =
+                new ProviderManager(
+                        simpleLdapAuthenticationProvider,
+                        simpleCacheUserAuthenticationProvider);
         return providerManager;
     }
 

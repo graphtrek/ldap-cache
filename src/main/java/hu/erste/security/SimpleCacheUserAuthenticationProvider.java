@@ -19,7 +19,8 @@ public class SimpleCacheUserAuthenticationProvider implements AuthenticationProv
 
     @Override
     public Authentication authenticate(Authentication authentication) throws AuthenticationException {
-        final String username = (authentication.getPrincipal() == null) ? "NONE_PROVIDED" : authentication.getName();
+        final String username =
+                (authentication.getPrincipal() == null) ? "NONE_PROVIDED" : authentication.getName();
         if (ObjectUtils.isEmpty(username)) {
             throw new BadCredentialsException("invalid login details");
         }
