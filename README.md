@@ -1,7 +1,11 @@
 # ldap-cache
 
-If you visit the site at http://localhost:8080, you should be redirected to a login page provided by Spring Security.
+https://docs.spring.io/spring-security/reference/servlet/authentication/architecture.html
 
-Enter a user name of ben and a password of benspassword. You should see the following message in your browser:
+https://docs.spring.io/spring-security/reference/servlet/authentication/passwords/in-memory.html
 
-Welcome to the home page!
+https://www.javadevjournal.com/spring-security/spring-security-multiple-authentication-providers/
+
+https://www.javadevjournal.com/spring-security/spring-security-custom-authentication-provider/
+
+https://www.codejava.net/frameworks/spring-boot/fix-websecurityconfigureradapter-deprecated

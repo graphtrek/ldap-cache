@@ -1,0 +1,24 @@
+application:
+    authentication:
+        devTechUser:
+            passwordHash: '"{bcrypt}$2a$12$dqvc0Qk/D6Ru9n4UK7kaRe7tTbBZKNowXJLM32TJxPZkVAZgQflWK"'
+            username: _esl_internal_ws
+        ldap:
+            authorizedGroup: APP_ESL_WS_USER
+            baseDN: DC=erste,DC=hu
+            enabled: true
+            groupSearchBase: ou=ESL,ou=Groups,ou=EBH
+            url: //lnvdevldp01.erste.hu:36511
+            userDnPattern: uid={0},ou=Technical_accounts,ou=
+            userCacheExpiryMs: 60000
+logging:
+    level:
+        org:
+            springframework:
+                security: INFO
+spring:
+    ldap:
+        embedded:
+            base-dn: dc=springframework,dc=org
+            ldif: classpath:test-server.ldif
+            port: 8389
