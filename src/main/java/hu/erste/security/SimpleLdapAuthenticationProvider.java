@@ -2,6 +2,7 @@ package hu.erste.security;
 
 import hu.erste.config.SecurityConfigurationProperties;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.ldap.core.LdapTemplate;
 import org.springframework.ldap.core.support.LdapContextSource;
 import org.springframework.ldap.filter.EqualsFilter;
@@ -16,13 +17,14 @@ import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.ArrayList;
-
+@Slf4j
 @AllArgsConstructor
 public class SimpleLdapAuthenticationProvider implements AuthenticationProvider
 {
     private SecurityConfigurationProperties props;
-    private LdapContextSource contextSource;
+
     private LdapTemplate ldapTemplate;
+    private SimpleCacheUserDetailsService simpleCacheUserDetailsService;
 
     @Override
     public Authentication authenticate(Authentication authentication) throws AuthenticationException {
@@ -43,8 +45,10 @@ public class SimpleLdapAuthenticationProvider implements AuthenticationProvider
                             userDetails,
                             authentication.getCredentials().toString(),
                             new ArrayList<>());
+            simpleCacheUserDetailsService.cacheUser(userDetails);
             return auth;
         } else {
+            log.warn("Invalid LDAP login details");
             throw new BadCredentialsException("Invalid LDAP login details");
         }
     }

@@ -1,16 +1,17 @@
 package hu.erste.security;
 
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.util.ObjectUtils;
+
+@Slf4j
 @AllArgsConstructor
 public class SimpleCacheUserAuthenticationProvider implements AuthenticationProvider {
 
@@ -22,27 +23,16 @@ public class SimpleCacheUserAuthenticationProvider implements AuthenticationProv
         final String username =
                 (authentication.getPrincipal() == null) ? "NONE_PROVIDED" : authentication.getName();
         if (ObjectUtils.isEmpty(username)) {
-            throw new BadCredentialsException("invalid login details");
+            throw new BadCredentialsException("Invalid login details");
         }
-        // get user details using Spring security user details service
-        UserDetails user = null;
-        try {
-            user = userDetailsService.loadUserByUsername(username);
-        } catch (UsernameNotFoundException exception) {
-            createUser(authentication);
-            // throw new BadCredentialsException("invalid login details");
-        }
-        return createSuccessfulAuthentication(authentication);
-    }
 
-    private void createUser(Authentication authentication){
-        UserDetails user =
-                User
-                        .withUsername(authentication.getPrincipal().toString())
-                        .authorities(authentication.getAuthorities())
-                        .password(passwordEncoder.encode(authentication.getCredentials().toString()))
-                        .build();
-        userDetailsService.cacheUser(user);
+        try {
+            userDetailsService.loadUserByUsername(username);
+        } catch (UsernameNotFoundException exception) {
+            throw new BadCredentialsException("User not found in cache, lookup in LDAP");
+        }
+
+        return createSuccessfulAuthentication(authentication);
     }
 
     private Authentication createSuccessfulAuthentication(final Authentication authentication) {

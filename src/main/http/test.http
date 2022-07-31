@@ -1,4 +1,4 @@
-###
+### not in ldap should not be authenticated
 GET http://localhost:8080
 Authorization: Basic X2VzbF9pbnRlcm5hbF93czpfZXNsX2ludGVybmFsX3dz
 
@@ -8,4 +8,4 @@ Authorization: Basic Ym9iOmJvYnNwYXNzd29yZA==
 
 ### ben:$2a$10$c6bSeWPhg06xB1lvmaWNNe4NROmZiSpYhlocU/98HNr2MhIOiSt36
 GET http://localhost:8080
-Authorization: Basic Ym9iOmJvYnNwYXNzd29yZA==
+Authorization: Basic YmVuOiQyYSQxMCRjNmJTZVdQaGcwNnhCMWx2bWFXTk5lNE5ST21aaVNwWWhsb2NVLzk4SE5yMk1oSU9pU3QzNg==

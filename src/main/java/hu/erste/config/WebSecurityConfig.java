@@ -46,9 +46,13 @@ public class WebSecurityConfig {
     @Bean
     SimpleLdapAuthenticationProvider simpleLdapAuthenticationProvider(
             SecurityConfigurationProperties props,
-            LdapContextSource contextSource,
-            LdapTemplate ldapTemplate){
-        return new SimpleLdapAuthenticationProvider(props,contextSource,ldapTemplate);
+            LdapTemplate ldapTemplate,
+            SimpleCacheUserDetailsService simpleCacheUserDetailsService){
+
+        return new SimpleLdapAuthenticationProvider(
+                props,
+                ldapTemplate,
+                simpleCacheUserDetailsService);
     }
 
     @Bean
@@ -77,8 +81,8 @@ public class WebSecurityConfig {
             SimpleCacheUserAuthenticationProvider simpleCacheUserAuthenticationProvider) {
         ProviderManager providerManager =
                 new ProviderManager(
-                        simpleLdapAuthenticationProvider,
-                        simpleCacheUserAuthenticationProvider);
+                        simpleCacheUserAuthenticationProvider,
+                        simpleLdapAuthenticationProvider);
         return providerManager;
     }
 
