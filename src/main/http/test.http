@@ -1,4 +1,4 @@
-### not in ldap should not be authenticated
+### technical user _esl_internal_ws:_esl_internal_ws
 GET http://localhost:8080
 Authorization: Basic X2VzbF9pbnRlcm5hbF93czpfZXNsX2ludGVybmFsX3dz
 

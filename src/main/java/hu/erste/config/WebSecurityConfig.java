@@ -4,16 +4,16 @@ import hu.erste.security.SimpleCacheUserAuthenticationProvider;
 import hu.erste.security.SimpleCacheUserDetailsService;
 import hu.erste.security.SimpleLdapAuthenticationProvider;
 import hu.erste.security.SimpleUserCache;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.ldap.core.LdapTemplate;
-import org.springframework.ldap.core.support.LdapContextSource;
-import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
@@ -25,34 +25,6 @@ public class WebSecurityConfig {
     @ConfigurationProperties(prefix = "application.authentication")
     public SecurityConfigurationProperties securityConfigurationProperties() {
         return new SecurityConfigurationProperties();
-    }
-
-    @Bean
-    public LdapContextSource ldapContextSource(SecurityConfigurationProperties props) {
-        LdapContextSource contextSource = new LdapContextSource();
-        contextSource.setUrl(props.getLdap().getUrl());
-        contextSource.setAnonymousReadOnly(true);
-        contextSource.setUserDn("uid={0},ou=people");
-        //contextSource.setBase("ou=groups");
-        contextSource.afterPropertiesSet();
-        return contextSource;
-    }
-
-    @Bean
-    LdapTemplate ldapTemplate(LdapContextSource ldapContextSource) {
-        return new LdapTemplate(ldapContextSource);
-    }
-
-    @Bean
-    SimpleLdapAuthenticationProvider simpleLdapAuthenticationProvider(
-            SecurityConfigurationProperties props,
-            LdapTemplate ldapTemplate,
-            SimpleCacheUserDetailsService simpleCacheUserDetailsService){
-
-        return new SimpleLdapAuthenticationProvider(
-                props,
-                ldapTemplate,
-                simpleCacheUserDetailsService);
     }
 
     @Bean
@@ -76,14 +48,34 @@ public class WebSecurityConfig {
     }
 
     @Bean
+    @ConditionalOnBean(SimpleLdapAuthenticationProvider.class)
+    public ProviderManager providerManagerWithLDAP(
+            SimpleCacheUserAuthenticationProvider simpleCacheUserAuthenticationProvider,
+            SimpleLdapAuthenticationProvider simpleLdapAuthenticationProvider) {
+
+        return new ProviderManager(
+                simpleCacheUserAuthenticationProvider,
+                simpleLdapAuthenticationProvider);
+
+    }
+
+    @Bean
+    @ConditionalOnMissingBean(SimpleLdapAuthenticationProvider.class)
     public ProviderManager providerManager(
-            SimpleLdapAuthenticationProvider simpleLdapAuthenticationProvider,
+            SecurityConfigurationProperties props,
+            SimpleUserCache userCache,
             SimpleCacheUserAuthenticationProvider simpleCacheUserAuthenticationProvider) {
-        ProviderManager providerManager =
-                new ProviderManager(
-                        simpleCacheUserAuthenticationProvider,
-                        simpleLdapAuthenticationProvider);
-        return providerManager;
+
+        if(!props.getLdap().isEnabled()) {
+            userCache.putTechUserInCache(User.withUsername(props.getDevTechUser().getUsername())
+                    .password(props.getDevTechUser().getPasswordHash())
+                    .authorities("USER")
+                    .build());
+
+        }
+        return new ProviderManager(
+                simpleCacheUserAuthenticationProvider);
+
     }
 
     @Bean
@@ -94,9 +86,9 @@ public class WebSecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(
             HttpSecurity http,
-            AuthenticationManager authenticationManager) throws Exception {
+            ProviderManager providerManager) throws Exception {
 
-        http.authenticationManager(authenticationManager);
+        http.authenticationManager(providerManager);
         http
                 .csrf().disable()
                 .authorizeRequests()

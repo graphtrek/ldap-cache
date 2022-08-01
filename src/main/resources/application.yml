@@ -4,12 +4,10 @@ application:
             passwordHash: '"{bcrypt}$2a$12$dqvc0Qk/D6Ru9n4UK7kaRe7tTbBZKNowXJLM32TJxPZkVAZgQflWK"'
             username: _esl_internal_ws
         ldap:
-            authorizedGroup: APP_ESL_WS_USER
-            baseDN: DC=erste,DC=hu
+            baseDN: dc=springframework,dc=org
             enabled: true
-            groupSearchBase: ou=ESL,ou=Groups,ou=EBH
-            url: ldap://localhost:8389/dc=springframework,dc=org
-            userDnPattern: uid={0},ou=Technical_accounts,ou=
+            url: ldap://localhost:8389
+            userDnPattern: uid={0},ou=people
             userCacheExpiryMs: 60000
 logging:
     level:

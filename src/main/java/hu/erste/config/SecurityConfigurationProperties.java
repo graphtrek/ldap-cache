@@ -31,11 +31,9 @@ public class SecurityConfigurationProperties implements Validator {
     @Getter
     @Setter
     public static class LdapProperty {
-        private String url;
-        private String baseDN = "dc=erste,dc=hu";
-        private String userDnPattern = "uid={0},ou=Technical_accounts,ou=EBH";
-        private String groupSearchBase = "ou=ESL,ou=Groups,ou=EBH";
-        private String authorizedGroup = "APP_ESL_WS_USER";
+        private String url = "ldap://localhost:8389";
+        private String baseDN = "dc=springframework,dc=org";
+        private String userDnPattern = "uid={0},ou=people";
         private boolean enabled = true;
         private int userCacheExpiryMs = 600 * 1000;
     }
