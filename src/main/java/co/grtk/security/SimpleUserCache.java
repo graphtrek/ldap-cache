@@ -1,4 +1,4 @@
-package hu.erste.security;
+package co.grtk.security;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

@@ -1,10 +1,9 @@
-package hu.erste.security;
+package co.grtk.security;
 
-import hu.erste.config.SecurityConfigurationProperties;
+import co.grtk.config.SecurityConfigurationProperties;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.ldap.core.LdapTemplate;
-import org.springframework.ldap.core.support.LdapContextSource;
 import org.springframework.ldap.filter.EqualsFilter;
 import org.springframework.ldap.filter.Filter;
 import org.springframework.ldap.support.LdapUtils;

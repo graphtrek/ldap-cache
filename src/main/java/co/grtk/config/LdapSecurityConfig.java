@@ -1,7 +1,7 @@
-package hu.erste.config;
+package co.grtk.config;
 
-import hu.erste.security.SimpleCacheUserDetailsService;
-import hu.erste.security.SimpleLdapAuthenticationProvider;
+import co.grtk.security.SimpleLdapAuthenticationProvider;
+import co.grtk.security.SimpleCacheUserDetailsService;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

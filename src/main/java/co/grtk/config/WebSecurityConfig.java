@@ -1,9 +1,9 @@
-package hu.erste.config;
+package co.grtk.config;
 
-import hu.erste.security.SimpleCacheUserAuthenticationProvider;
-import hu.erste.security.SimpleCacheUserDetailsService;
-import hu.erste.security.SimpleLdapAuthenticationProvider;
-import hu.erste.security.SimpleUserCache;
+import co.grtk.security.SimpleCacheUserAuthenticationProvider;
+import co.grtk.security.SimpleLdapAuthenticationProvider;
+import co.grtk.security.SimpleUserCache;
+import co.grtk.security.SimpleCacheUserDetailsService;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.context.properties.ConfigurationProperties;

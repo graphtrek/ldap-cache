@@ -1,4 +1,4 @@
-package hu.erste;
+package co.grtk;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
