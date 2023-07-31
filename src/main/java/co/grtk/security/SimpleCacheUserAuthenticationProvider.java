@@ -15,7 +15,7 @@ import org.springframework.util.ObjectUtils;
 @AllArgsConstructor
 public class SimpleCacheUserAuthenticationProvider implements AuthenticationProvider {
 
-    SimpleCacheUserDetailsService userDetailsService;
+    SimpleCacheUserDetailsService simpleCacheUserDetailsService;
     PasswordEncoder passwordEncoder;
 
     @Override
@@ -27,7 +27,7 @@ public class SimpleCacheUserAuthenticationProvider implements AuthenticationProv
         }
 
         try {
-            userDetailsService.loadUserByUsername(username);
+            simpleCacheUserDetailsService.loadUserByUsername(username);
         } catch (UsernameNotFoundException exception) {
             throw new BadCredentialsException("User not found in cache, lookup in LDAP");
         }

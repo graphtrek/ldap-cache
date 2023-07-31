@@ -15,3 +15,5 @@ https://www.javadevjournal.com/spring-security/spring-security-multiple-authenti
 https://www.codejava.net/frameworks/spring-boot/fix-websecurityconfigureradapter-deprecated
 
 https://decodebase64.com/
+
+![spring-security-6-flow.png](spring-security-6-flow.png)
