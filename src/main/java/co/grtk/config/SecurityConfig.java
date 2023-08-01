@@ -35,7 +35,7 @@ public class SecurityConfig {
     }
 
     @Bean
-    public SimpleUserCache simpleEserCache(SecurityConfigurationProperties props) {
+    public SimpleUserCache simpleUserCache(SecurityConfigurationProperties props) {
         return new SimpleUserCache(props.getLdap().getUserCacheExpiryMs());
     }
 
